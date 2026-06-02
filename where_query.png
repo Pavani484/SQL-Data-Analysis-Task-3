@@ -1,0 +1,70 @@
+
+CREATE DATABASE ecommerce_db;
+USE ecommerce_db;
+CREATE TABLE Customers (customer_id INT PRIMARY KEY,customer_name VARCHAR(100),city VARCHAR(100));
+CREATE TABLE Products (product_id INT PRIMARY KEY,product_name VARCHAR(100),price DECIMAL(10,2));
+CREATE TABLE Orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    product_id INT,
+    quantity INT,
+    order_date DATE,
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+INSERT INTO Customers VALUES
+(1,'Pavani','Bangalore'),
+(2,'Rahul','Hyderabad'),
+(3,'Anjali','Chennai'),
+(4,'Ravi','Mumbai');
+
+INSERT INTO Products VALUES
+(101,'Laptop',50000),
+(102,'Mouse',500),
+(103,'Keyboard',1200),
+(104,'Monitor',15000);
+
+INSERT INTO Orders VALUES
+(1,1,101,1,'2025-05-01'),
+(2,1,102,2,'2025-05-02'),
+(3,2,103,1,'2025-05-03'),
+(4,3,101,1,'2025-05-04'),
+(5,4,104,1,'2025-05-05');
+SELECT * FROM Customers;
+SELECT * FROM Customers WHERE city = 'Bangalore';
+SELECT * FROM Products ORDER BY price DESC;
+SELECT customer_id,COUNT(order_id) AS total_orders FROM Orders GROUP BY customer_id;
+SELECT SUM(quantity) AS total_quantity FROM Orders;
+SELECT AVG(price) AS average_price FROM Products;
+SELECT c.customer_name,p.product_name,o.quantity 
+FROM Orders o
+INNER JOIN Customers c
+ON o.customer_id = c.customer_id
+INNER JOIN Products p
+ON o.product_id = p.product_id;
+
+SELECT
+c.customer_name,
+o.order_id
+FROM Customers c
+LEFT JOIN Orders o
+ON c.customer_id = o.customer_id;
+
+SELECT * FROM Products WHERE price >(SELECT AVG(price) FROM Products);
+
+CREATE VIEW customer_order_summary AS
+SELECT
+c.customer_name,
+COUNT(o.order_id) AS total_orders
+FROM Customers c
+LEFT JOIN Orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.customer_name;
+
+SELECT * FROM customer_order_summary;
+
+
+CREATE INDEX idx_customer
+ON Orders(customer_id);
+
+SHOW INDEX FROM Orders;
